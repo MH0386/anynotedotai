@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
 class ChatacterController extends GetxController {
@@ -9,6 +10,8 @@ class ChatacterController extends GetxController {
   final isVideo = false.obs;
   final isAppInDarkMode = false.obs;
   getTextResponse(String query) {
-    print('Query: $query');
+    if (kDebugMode) {
+      print('Query: $query');
+    }
       }
 }

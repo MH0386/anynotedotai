@@ -1,4 +1,5 @@
 import 'package:anynotedotai/controller.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -36,12 +37,18 @@ class Settings extends StatelessWidget {
                         chatacterController.isAppInDarkMode.value = value;
                         if (chatacterController.isAppInDarkMode.value) {
                           Get.changeTheme(ThemeData.dark());
-                          print('Changed to Dark Theme');
+                          if (kDebugMode) {
+                            print('Changed to Dark Theme');
+                          }
                         } else {
                           Get.changeTheme(ThemeData.light());
-                          print('Changed to Light Theme');
+                          if (kDebugMode) {
+                            print('Changed to Light Theme');
+                          }
                         }
-                        print('IsAppInDarkMode Switched to ${chatacterController.isAppInDarkMode.value}, Get.isDarkMode: ${Get.isDarkMode}');
+                        if (kDebugMode) {
+                          print('IsAppInDarkMode Switched to ${chatacterController.isAppInDarkMode.value}, Get.isDarkMode: ${Get.isDarkMode}');
+                        }
                       },
                     ),
                   ),
@@ -57,7 +64,9 @@ class Settings extends StatelessWidget {
                       value: chatacterController.isText.value,
                       onChanged: (bool value) {
                         chatacterController.isText.value = value;
-                        print('IsText Switched to ${chatacterController.isText.value}');
+                        if (kDebugMode) {
+                          print('IsText Switched to ${chatacterController.isText.value}');
+                        }
                       },
                     ),
                   ),
@@ -73,7 +82,9 @@ class Settings extends StatelessWidget {
                       value: chatacterController.isVoice.value,
                       onChanged: (bool value) {
                         chatacterController.isVoice.value = value;
-                        print('IsVoice Switched to ${chatacterController.isVoice.value}');
+                        if (kDebugMode) {
+                          print('IsVoice Switched to ${chatacterController.isVoice.value}');
+                        }
                       },
                     ),
                   ),
@@ -89,7 +100,9 @@ class Settings extends StatelessWidget {
                       value: chatacterController.isVideo.value,
                       onChanged: (bool value) {
                         chatacterController.isVideo.value = value;
-                        print('IsVideo Switched to ${chatacterController.isVideo.value}');
+                        if (kDebugMode) {
+                          print('IsVideo Switched to ${chatacterController.isVideo.value}');
+                        }
                       },
                     ),
                   ),

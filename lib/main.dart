@@ -2,6 +2,7 @@ import 'package:anynotedotai/Pages/about.dart';
 import 'package:anynotedotai/Pages/home.dart';
 import 'package:anynotedotai/Pages/settings.dart';
 import 'package:anynotedotai/controller.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -10,11 +11,13 @@ Future<void> main() async {
   // Client client = Client();
   // client.setEndpoint('https://cloud.appwrite.io/v1').setProject('chatacter');
   Get.put(ChatacterController());
-  Get.changeTheme(ThemeData.light());
-  print('Get.isDarkMode: ${Get.isDarkMode}');
+  Get.changeTheme(ThemeData.dark());
+  if (kDebugMode) {
+    print('Get.isDarkMode: ${Get.isDarkMode}');
+  }
   runApp(
     GetMaterialApp(
-      title: 'Chatacter Demo',
+      title: 'AnyNote.AI Demo',
       initialRoute: '/',
       getPages: [
         GetPage(name: '/', page: () => const Home()),
