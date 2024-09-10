@@ -1,7 +1,6 @@
-import 'package:chatacter/Pages/about.dart';
-import 'package:chatacter/Pages/chat.dart';
-import 'package:chatacter/Pages/settings.dart';
-import 'package:chatacter/controller.dart';
+import 'package:anynotedotai/Pages/about.dart';
+import 'package:anynotedotai/Pages/settings.dart';
+import 'package:anynotedotai/controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -92,7 +91,7 @@ class Home extends StatelessWidget {
                                   print('Chat 1 pressed');
                                   chatacterController.character.value = 'Napoleon Bonaparte';
                                   chatacterController.response.value = 'Hi, My name is Napoleon Bonaparte. How can I help you?';
-                                  Get.to(() => const Chat());
+                                  // Get.to(() => const Chat());
                                 },
                               ),
                             ),

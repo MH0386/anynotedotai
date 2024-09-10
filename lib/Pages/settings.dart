@@ -1,4 +1,4 @@
-import 'package:chatacter/controller.dart';
+import 'package:anynotedotai/controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
