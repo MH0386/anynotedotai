@@ -11,6 +11,7 @@ dependencies:
   url_launcher: ^6.3.0
   flutter_launcher_icons: ^0.13.1
   hidden_drawer_menu: ^3.0.1
+  appwrite: ^13.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

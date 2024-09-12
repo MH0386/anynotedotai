@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace = "com.example.myapp"
+    namespace = "com.MH0386.AnyNoteDotAI"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
