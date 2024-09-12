@@ -1,1 +1,1 @@
-# Anynote.AI
+# AnyNote.AI
