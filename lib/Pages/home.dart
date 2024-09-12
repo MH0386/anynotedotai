@@ -1,7 +1,4 @@
-import 'package:chatacter/Pages/about.dart';
-import 'package:chatacter/Pages/chat.dart';
-import 'package:chatacter/Pages/settings.dart';
-import 'package:chatacter/controller.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -10,48 +7,10 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chatacterController = Get.find<ChatacterController>();
+    // final chatacterController = Get.find<ChatacterController>();
     return MaterialApp(
-      // theme: ThemeData.dark(),
+      theme: ThemeData.dark(),
       home: Scaffold(
-        appBar: AppBar(
-          elevation: 100,
-          title: const Text('Home'),
-          leading: IconButton(
-            onPressed: () {
-              print('Menu Button Pressed');
-              Get.bottomSheet(
-                Wrap(
-                  children: [
-                    Card(
-                      child: ListTile(
-                        leading: const Icon(Icons.info_outline),
-                        title: const Text('About Chatacter'),
-                        onTap: () {
-                          print('About pressed');
-                          Get.to(() => const About());
-                        },
-                      ),
-                    ),
-                    Card(
-                      child: ListTile(
-                        leading: const Icon(Icons.settings),
-                        title: const Text('Settings'),
-                        onTap: () {
-                          print('Settings pressed');
-                          Get.to(() => const Settings());
-                        },
-                      ),
-                    )
-                  ],
-                ),
-              );
-            },
-            icon: const Icon(
-              Icons.menu,
-            ),
-          ),
-        ),
         body: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
             double screenWidth = constraints.maxWidth;
@@ -60,16 +19,15 @@ class Home extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Welcome to Chatacter',
+                    'Welcome to AnyNote.AI',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: screenWidth * 0.08,
                     ),
                   ),
-                  const SizedBox(height: 10),
                   Text(
-                    'This is a chat bot app\nClick the button below to start chatting',
+                    'This is a note app\nClick the button below to add new notes',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -78,33 +36,40 @@ class Home extends StatelessWidget {
                   ),
                   const SizedBox(height: 40),
                   FloatingActionButton.extended(
+                    backgroundColor: Colors.black,
                     onPressed: () {
-                      print('New Chat Button Pressed');
+                      if (kDebugMode) {
+                        print('New Chat Button Pressed');
+                      }
                       Get.bottomSheet(
-                        Wrap(
+                        const Wrap(
                           children: [
                             Card(
+                              color: Colors.black,
                               child: ListTile(
-                                leading: const Icon(Icons.person),
-                                title: const Text('Napoleon Bonaparte'),
-                                subtitle: const Text('You are now can chat with Napoleon Bonaparte'),
-                                onTap: () {
-                                  print('Chat 1 pressed');
-                                  chatacterController.character.value = 'Napoleon Bonaparte';
-                                  chatacterController.response.value = 'Hi, My name is Napoleon Bonaparte. How can I help you?';
-                                  Get.to(() => const Chat());
-                                },
-                              ),
-                            ),
-                            const Card(
-                              child: ListTile(
-                                leading: Icon(Icons.announcement),
-                                title: Text('Coming Soon...'),
-                                subtitle: Text('More chat options will be available soon'),
+                                leading: Icon(
+                                  Icons.note_add_outlined,
+                                  color: Colors.white,
+                                ),
+                                title: Text(
+                                  'New Note',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  'create a new note',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
                             )
                           ],
                         ),
+                        backgroundColor: const Color.fromARGB(255, 0, 0, 0),
+                        barrierColor: const Color.fromARGB(155, 0, 0, 0),
+                        elevation: 10,
                       );
                     },
                     label: const Text('New Chat'),
