@@ -11,17 +11,6 @@ class Settings extends StatelessWidget {
     final chatacterController = Get.find<ChatacterController>();
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Settings'),
-          leading: IconButton(
-            onPressed: () {
-              Get.back();
-            },
-            icon: const Icon(
-              Icons.arrow_back,
-            ),
-          ),
-        ),
         body: Center(
           child: ListView(
             children: [

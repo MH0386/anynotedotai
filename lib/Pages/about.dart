@@ -1,6 +1,4 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:url_launcher/link.dart';
 
 class About extends StatelessWidget {
@@ -11,20 +9,6 @@ class About extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData.dark(),
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('About AnyNote.AI'),
-          leading: IconButton(
-            onPressed: () {
-              if (kDebugMode) {
-                print('Back');
-              }
-              Get.back();
-            },
-            icon: const Icon(
-              Icons.arrow_back,
-            ),
-          ),
-        ),
         body: Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
