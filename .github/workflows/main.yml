@@ -5,19 +5,15 @@ on:
       - main
 jobs:
   build:
-    name: build
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: subosito/flutter-action@v2
-    - uses: oberhauser-dev/flutter-release-action@v0
-      with:
-        token: ${{ secrets.TOKEN_GITHUB }}
-        dry-run: true
-        app-name: 'my_flutter_app'
-        app-version: ${{ github.ref_name }} # or set manually: 'v1.2.3-alpha.4'
-        tag: ${{ github.ref }}
-        build-type: 'debian'
-        build-args: |-
-          --dart-define=API_URL="https://example.com"
-          --dart-define=API_KEY=12345678
+      - name: Checkout
+        uses: actions/checkout@v4.1.7
+      - name: Build Android bundle
+        uses: AcmeSoftwareLLC/flutter-build@v1
+        with:
+          platform: android
+          build-name: 1.0.0
+          build-number: 20231005
+          pub-get: true
+          gen-icons: false
