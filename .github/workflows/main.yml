@@ -1,19 +1,61 @@
-name: Flutter Build
+name: Build and Release Flutter APK
 on:
-  push:
-    branches:
-      - main
+    push:
+        branches:
+            - main
+    workflow_dispatch:
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4.1.7
-      - name: Build Android bundle
-        uses: AcmeSoftwareLLC/flutter-build@v1
-        with:
-          platform: android
-          build-name: 1.0.0
-          build-number: 20231005
-          pub-get: true
-          gen-icons: false
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+            - name: Cache
+              uses: actions/cache@v4
+              with:
+                  path: ~/.pub-cache
+                  key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+                  restore-keys: ${{ runner.os }}-pub-
+            - name: Set up Flutter
+              uses: subosito/flutter-action@v2
+              with:
+                  channel: 'stable'
+            - name: Install dependencies
+              run: flutter pub get
+            - name: Build APK
+              run: flutter build apk --release
+            - name: Upload APK
+              uses: actions/upload-artifact@v2
+              with:
+                  name: app-release.apk
+                  path: build/app/outputs/flutter-apk/app-release.apk
+    release:
+        needs: build
+        runs-on: ubuntu-latest
+        steps:
+            - name: Download APK
+              uses: actions/download-artifact@v2
+              with:
+                  name: app-release.apk
+                  path: .
+
+            - name: Create GitHub Release
+              id: create_release
+              uses: actions/create-release@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+              with:
+                  tag_name: v1.0.0 # Update this as needed
+                  release_name: Release v1.0.0
+                  draft: false
+                  prerelease: false
+
+            - name: Upload APK to Release
+              uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  asset_path: ./app-release.apk
+                  asset_name: app-release.apk
+                  asset_content_type: application/vnd.android.package-archive
