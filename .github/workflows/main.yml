@@ -26,10 +26,10 @@ jobs:
             - name: Generate keystore.properties
               run: |
                   cat <<EOF > keystore.properties
-                  storePassword:${{ secrets.KEYSTORE_PASSWORD }}
-                  keyPassword:${{ secrets.KEYSTORE_PASSWORD }}
-                  keyAlias:upload
-                  storeFile:upload-keystore.jks
+                  storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+                  keyPassword=${{ secrets.KEYSTORE_PASSWORD }}
+                  keyAlias=upload
+                  storeFile=upload-keystore.jks
                   EOF
             - name: Decode keystore and create jks
               run: echo "${{ secrets.KEYSTORE_JKS_BASE64 }}" | base64 --decode > android/upload-keystore.jks
