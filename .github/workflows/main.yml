@@ -48,12 +48,12 @@ jobs:
             - name: Build APK
               run: flutter build apk --release
             - name: Rename APK
-              run: mv ./build/outputs/apk/release/app-release.apk ./AnyNote.AI_.apk
+              run: mv ./build/outputs/apk/release/app-release.apk ./AnyNote.AI.apk
             - name: Upload APK
               uses: actions/upload-artifact@v4
               with:
-                  name: app-release.apk
-                  path: ./app-release.apk
+                  name: AnyNote.AI.apk
+                  path: ./AnyNote.AI.apk
     release:
         needs: build
         runs-on: ubuntu-latest
@@ -61,7 +61,7 @@ jobs:
             - name: Download APK
               uses: actions/download-artifact@v4
               with:
-                  name: app-release.apk
+                  name: AnyNote.AI.apk
                   path: .
             # - name: Create GitHub Release
             #   id: create_release
