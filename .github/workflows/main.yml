@@ -38,10 +38,10 @@ jobs:
               with:
                   channel: "stable"
                   cache: true
-            - name: Install dependencies
-              run: flutter pub get
             - name: Clean
               run: flutter clean
+            - name: Install dependencies
+              run: flutter pub get
             - name: Build APK
               run: flutter build apk --release
             - name: Upload APK
