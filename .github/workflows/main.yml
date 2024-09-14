@@ -23,17 +23,16 @@ jobs:
                   java-version: "17"
             # - name: Setup Android SDK Tools
             #   uses: android-actions/setup-android@v3.2.1
-            - run: echo $PWD
             - name: Generate keystore.properties
               run: |
                   cat <<EOF > ./android/key.properties
                   storePassword=${{ secrets.KEYSTORE_PASSWORD }}
                   keyPassword=${{ secrets.KEYSTORE_PASSWORD }}
                   keyAlias=upload
-                  storeFile=/home/runner/work/anynotedotai/android/app/upload-keystore.jks
+                  storeFile=./upload-keystore.jks
                   EOF
             - name: Decode keystore and create jks
-              run: echo "${{ secrets.KEYSTORE_JKS_BASE64 }}" | base64 --decode > ./android/upload-keystore.jks
+              run: echo "${{ secrets.KEYSTORE_JKS_BASE64 }}" | base64 --decode > ./android/app/upload-keystore.jks
             - name: Set up Flutter
               uses: subosito/flutter-action@v2
               with:
