@@ -23,6 +23,13 @@ jobs:
                   java-version: "17"
             # - name: Setup Android SDK Tools
             #   uses: android-actions/setup-android@v3.2.1
+            - name: Generate keystore.properties
+              run: |
+                touch android/key.properties
+                echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> android/key.properties
+                echo "keyPassword=${{ secrets.KEYSTORE_PASSWORD }}" >> android/key.properties
+                echo "keyAlias=upload" >> android/key.properties
+                echo "storeFile=android/upload-keystore.jks" >> android/key.properties
             - name: Set up Flutter
               uses: subosito/flutter-action@v2
               with:
