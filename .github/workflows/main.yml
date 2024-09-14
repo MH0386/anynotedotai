@@ -10,6 +10,8 @@ permissions:
 jobs:
     build:
         runs-on: ubuntu-latest
+        env:
+            GH_TOKEN: ${{ secrets.TOKEN_GITHUB }}
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
@@ -47,46 +49,73 @@ jobs:
               run: flutter pub get
             - name: Build APK
               run: flutter build apk --release
+            - name: Build AppBundle
+              run: flutter build appbundle
             - name: Rename APK
               run: mv ./build/app/outputs/flutter-apk/app-release.apk ./AnyNote.AI.apk
-            - name: Upload APK
+            - name: Rename AppBundle
+              run: mv ./build/app/outputs/bundle/release/app-release.aab ./AnyNote.AI.aab
+            - name: Upload Artifacts
               uses: actions/upload-artifact@v4
               with:
-                  name: AnyNote.AI.apk
-                  path: ./AnyNote.AI.apk
-    release:
-        needs: build
-        runs-on: ubuntu-latest
-        env:
-            GH_TOKEN: ${{ secrets.TOKEN_GITHUB }}
-        steps:
-            - name: Download APK
-              uses: actions/download-artifact@v4
-              with:
-                  name: AnyNote.AI.apk
-                  path: .
-            # - name: Create GitHub Release
-            #   id: create_release
-            #   uses: actions/create-release@v1
-            #   env:
-            #       GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
-            #   with:
-            #       tag_name: ${{ github.ref_name }}
-            #       release_name: Release ${{ github.ref_name }}
-            #       draft: false
-            #       prerelease: false
-            # - name: Upload APK to Release
-            #   uses: actions/upload-release-asset@v1
-            #   env:
-            #       GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
-            #   with:
-            #       upload_url: ${{ steps.create_release.outputs.upload_url }}
-            #       asset_path: ./app-release.apk
-            #       asset_name: app-release.apk
-            #       asset_content_type: application/vnd.android.package-archive
-            - name: Create release
+                  name: Releases
+                  path: |
+                      ./AnyNote.AI.apk
+                      ./AnyNote.AI.aab
+            - name: Extract version from pubspec.yaml
+              id: extract_version
               run: |
-                  gh release create "$tag" \
-                      --repo="$GITHUB_REPOSITORY" \
-                      --title="${tag#v}" \
-                      --generate-notes
+                  version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
+                  echo "VERSION=$version" >> $GITHUB_ENV
+            - name: Check if Tag Exists
+              id: check_tag
+              run: |
+                  if git rev-parse "v${{ env.VERSION }}" >/dev/null 2>&1; then
+                    echo "TAG_EXISTS=true" >> $GITHUB_ENV
+                  else
+                    echo "TAG_EXISTS=false" >> $GITHUB_ENV
+                  fi
+            - name: Modify Tag
+              if: env.TAG_EXISTS == 'true'
+              id: modify_tag
+              run: |
+                  new_version=${{ env.VERSION }}+0.0.1
+                  echo "VERSION=$new_version" >> $GITHUB_ENV
+            - name: Create Release
+              run: |
+                  gh release create ${{ env.VERSION }} \
+                      --repo=MH0386/anynotedotai \
+                      --title="Version ${{ env.VERSION }}" \
+                      --generate-notes \
+                      --latest
+
+    # release:
+    #     needs: build
+    #     runs-on: ubuntu-latest
+    #     env:
+    #         GH_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+    #     steps:
+    #         - name: Download APK
+    #           uses: actions/download-artifact@v4
+    #           with:
+    #               name: Releases
+    #               path: .
+    #         - name: Create GitHub Release
+    #           id: create_release
+    #           uses: actions/create-release@v1
+    #           env:
+    #               GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+    #           with:
+    #               tag_name: ${{ github.ref_name }}
+    #               release_name: Release ${{ github.ref_name }}
+    #               draft: false
+    #               prerelease: false
+    #         - name: Upload APK to Release
+    #           uses: actions/upload-release-asset@v1
+    #           env:
+    #               GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+    #           with:
+    #               upload_url: ${{ steps.create_release.outputs.upload_url }}
+    #               asset_path: ./app-release.apk
+    #               asset_name: app-release.apk
+    #               asset_content_type: application/vnd.android.package-archive
