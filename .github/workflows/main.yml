@@ -25,7 +25,7 @@ jobs:
             #   uses: android-actions/setup-android@v3.2.1
             - name: Generate keystore.properties
               run: |
-                  cat <<EOF > keystore.properties
+                  cat <<EOF > android/keystore.properties
                   storePassword=${{ secrets.KEYSTORE_PASSWORD }}
                   keyPassword=${{ secrets.KEYSTORE_PASSWORD }}
                   keyAlias=upload
