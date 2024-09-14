@@ -33,10 +33,6 @@ jobs:
                   EOF
             - name: Decode keystore and create jks
               run: echo "${{ secrets.KEYSTORE_JKS_BASE64 }}" | base64 --decode > ./android/upload-keystore.jks
-            - run: |
-                  ls -a
-                  cd android
-                  ls -a
             - name: Set up Flutter
               uses: subosito/flutter-action@v2
               with:
