@@ -23,8 +23,7 @@ jobs:
             - name: Install dependencies
               uses: upciti/wakemeops-action@v1
               with:
-                  packages: |
-                      dasel=2.8.1*
+                  packages: dasel
             - name: Set up Java
               uses: actions/setup-java@v4
               with:
@@ -87,7 +86,7 @@ jobs:
                   echo "VERSION=$new_version" >> $GITHUB_ENV
             - name: Update YAML file
               run: |
-                  dasel put string -f pubspec.yaml -p yaml "version" "${{ env.VERSION }}"
+                  dasel put -t string -f pubspec.yaml -r yaml -v ${{ env.VERSION }} "version"
             - name: Commit and Push
               run: |
                   git config --global user.email "mohamed.hisham.abdelzaher@gmail.com"
