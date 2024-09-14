@@ -25,14 +25,14 @@ jobs:
             #   uses: android-actions/setup-android@v3.2.1
             - name: Generate keystore.properties
               run: |
-                  cat <<EOF > android/keystore.properties
+                  cat <<EOF > ./android/keystore.properties
                   storePassword=${{ secrets.KEYSTORE_PASSWORD }}
                   keyPassword=${{ secrets.KEYSTORE_PASSWORD }}
                   keyAlias=upload
                   storeFile=upload-keystore.jks
                   EOF
             - name: Decode keystore and create jks
-              run: echo "${{ secrets.KEYSTORE_JKS_BASE64 }}" | base64 --decode > android/upload-keystore.jks
+              run: echo "${{ secrets.KEYSTORE_JKS_BASE64 }}" | base64 --decode > ./android/upload-keystore.jks
             - name: Set up Flutter
               uses: subosito/flutter-action@v2
               with:
