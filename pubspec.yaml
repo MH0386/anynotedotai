@@ -1,5 +1,5 @@
 name: anynotedotai
-description: "This is a simple note app built using Flutter and GetX"
+description: This is a simple note app built using Flutter and GetX
 version: 1.0.0
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -19,5 +19,5 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 flutter_launcher_icons:
-    android: true
-    image_path: "assets/logo.png"
+  android: true
+  image_path: assets/logo.png
