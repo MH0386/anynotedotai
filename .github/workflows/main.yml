@@ -98,9 +98,15 @@ jobs:
               run: |
                   gh release create ${{ env.VERSION }} \
                       --repo=MH0386/anynotedotai \
-                      --title="Version ${{ env.VERSION }}" \
+                      --title="Version v${{ env.VERSION }}" \
                       --generate-notes \
                       --latest
+            - name: Upload APK
+              run: |
+                  gh release upload ${{ env.VERSION }} \
+                  ./AnyNote.AI.apk \
+                  ./AnyNote.AI.aab \
+                  --clobber
 
     # release:
     #     needs: build
