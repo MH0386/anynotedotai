@@ -1,6 +1,6 @@
 name: anynotedotai
 description: This is a simple note app built using Flutter and GetX
-version: 1.0.3+2
+version: 1.0.1+1
 environment:
   sdk: '>=3.4.3 <4.0.0'
 dependencies:
