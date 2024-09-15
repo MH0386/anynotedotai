@@ -70,6 +70,11 @@ jobs:
         run: |
           version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
           echo "VERSION=$version" >> $GITHUB_ENV
+      - name: Extract version code from pubspec.yaml
+        id: extract_version_code
+        run: |
+          version_code=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | cut -d '+' -f 2 | tr -d '\r')
+          echo "VERSION_CODE=$version_code" >> $GITHUB_ENV
       - name: Update version
         id: modify_tag
         run: |
@@ -94,11 +99,16 @@ jobs:
               echo "$major.$minor.$patch"
           }
 
+          # Increment the version
           new_version=$(increment_version "${{ env.VERSION }}")
           echo "VERSION=$new_version" >> $GITHUB_ENV
+
+          # Increment the version code
+          new_version_code=$(( ${{ env.VERSION_CODE }} + 1 ))
+          echo "VERSION_CODE=$new_version_code" >> $GITHUB_ENV
       - name: Update YAML file
         run: |
-          dasel put -t string -f pubspec.yaml -r yaml -v ${{ env.VERSION }} "version"
+          dasel put -t string -f pubspec.yaml -r yaml -v ${{ env.VERSION }}+${{ env.VERSION_CODE }} "version"
       - name: Commit and Push
         run: |
           git config --global user.email "mohamed.hisham.abdelzaher@gmail.com"
