@@ -96,14 +96,14 @@ jobs:
                   git push
             - name: Create Release
               run: |
-                  gh release create ${{ env.VERSION }} \
+                  gh release create v${{ env.VERSION }} \
                       --repo=MH0386/anynotedotai \
                       --title="Version v${{ env.VERSION }}" \
                       --generate-notes \
                       --latest
             - name: Upload Assets
               run: |
-                  gh release upload ${{ env.VERSION }} \
+                  gh release upload v${{ env.VERSION }} \
                   ./AnyNote.AI.apk \
                   ./AnyNote.AI.aab \
                   --clobber
