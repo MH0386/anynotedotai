@@ -1,1 +1,1 @@
-AnyNote.AI is a powerful note-taking app that helps you organize your notes in a structured way.
+AnyNote.AI is a powerful note-taking app with AI.
