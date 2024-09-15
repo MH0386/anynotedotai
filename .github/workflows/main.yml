@@ -105,6 +105,7 @@ jobs:
           git config --global user.name "Mohamed Hisham Abdelzaher"
           git add pubspec.yaml
           git commit -m "Update version to ${{ env.VERSION }}"
+          git pull
           git push
       - name: Create Release
         run: |
