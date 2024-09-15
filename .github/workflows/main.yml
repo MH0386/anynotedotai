@@ -101,7 +101,7 @@ jobs:
                       --title="Version v${{ env.VERSION }}" \
                       --generate-notes \
                       --latest
-            - name: Upload APK
+            - name: Upload Assets
               run: |
                   gh release upload ${{ env.VERSION }} \
                   ./AnyNote.AI.apk \
