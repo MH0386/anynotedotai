@@ -1,23 +1,23 @@
 name: anynotedotai
 description: This is a simple note app built using Flutter and GetX
-version: 1.0.3+2
+version: 1.0.1+1
 environment:
-  sdk: '>=3.4.3 <4.0.0'
+    sdk: ">=3.4.3 <4.0.0"
 dependencies:
-  flutter:
-    sdk: flutter
-  cupertino_icons: ^1.0.6
-  get: ^4.6.6
-  url_launcher: ^6.3.0
-  flutter_launcher_icons: ^0.13.1
-  hidden_drawer_menu: ^3.0.1
-  appwrite: ^13.0.0
+    flutter:
+        sdk: flutter
+    cupertino_icons: ^1.0.6
+    get: ^4.6.6
+    url_launcher: ^6.3.0
+    flutter_launcher_icons: ^0.13.1
+    hidden_drawer_menu: ^3.0.1
+    appwrite: ^13.0.0
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^4.0.0
+    flutter_test:
+        sdk: flutter
+    flutter_lints: ^4.0.0
 flutter:
-  uses-material-design: true
+    uses-material-design: true
 flutter_launcher_icons:
-  android: true
-  image_path: assets/logo.png
+    android: true
+    image_path: assets/logo.png
