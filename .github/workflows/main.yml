@@ -70,19 +70,31 @@ jobs:
         run: |
           version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
           echo "VERSION=$version" >> $GITHUB_ENV
-      - name: Check if Tag Exists
-        id: check_tag
-        run: |
-          if git rev-parse "v${{ env.VERSION }}" >/dev/null 2>&1; then
-            echo "TAG_EXISTS=true" >> $GITHUB_ENV
-          else
-            echo "TAG_EXISTS=false" >> $GITHUB_ENV
-          fi
-      - name: Modify Tag
-        if: env.TAG_EXISTS == 'true'
+      - name: Update version
         id: modify_tag
         run: |
-          new_version=${{ env.VERSION }}+0.0.1
+          increment_version() {
+              # Split the version into an array
+              IFS='.' read -r major minor patch <<< "$1"
+
+              # Check if patch is 9
+              if [ "$patch" -eq 9 ]; then
+                  patch=0
+                  ((minor++))
+              else
+                  ((patch++))
+              fi
+
+              # Check if minor is now 10 (after incrementing)
+              if [ "$minor" -eq 10 ]; then
+                  minor=0
+                  ((major++))
+              fi
+
+              echo "$major.$minor.$patch"
+          }
+
+          new_version=$(increment_version "${{ env.VERSION }}")
           echo "VERSION=$new_version" >> $GITHUB_ENV
       - name: Update YAML file
         run: |
@@ -104,19 +116,17 @@ jobs:
       - name: Upload Assets
         run: |
           gh release upload v${{ env.VERSION }} \
-          ./AnyNote.AI.apk \
-          ./AnyNote.AI.aab \
-          --clobber
-      - name: Create service_account.json
-        run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
-      - name: Deploy to Alpha
+              ./AnyNote.AI.apk \
+              ./AnyNote.AI.aab \
+              --clobber
+      - name: Upload to Google Play
         uses: r0adkll/upload-google-play@v1
         with:
-          serviceAccountJson: service_account.json
-          packageName: com.jshvarts.flows
-          releaseFile: app/build/outputs/bundle/release/app-release.aab
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          packageName: com.MH0386.AnyNoteDotAI
+          releaseFiles: ./AnyNote.AI.aab
           track: alpha
-          whatsNewDirectory: distribution/
+
   # release:
   #     needs: build
   #     runs-on: ubuntu-latest
