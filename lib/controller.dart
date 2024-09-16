@@ -8,7 +8,5 @@ class ChatacterController extends GetxController {
   final isVoice = false.obs;
   final isVideo = false.obs;
   final isAppInDarkMode = false.obs;
-  getTextResponse(String query) {
-    print('Query: $query');
-      }
+  
 }
