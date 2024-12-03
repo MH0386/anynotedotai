@@ -1,0 +1,60 @@
+name: Fastlane
+on:
+    push:
+        branches:
+            - main
+    workflow_dispatch:
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+            - name: Cache
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      ~/.gradle/caches
+                      ~/.gradle/wrapper
+                      ~/.pub-cache
+                  key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+                  restore-keys: |
+                      ${{ runner.os }}-gradle-
+            - name: Set up Ruby
+              uses: ruby/setup-ruby@v1
+              with:
+                  ruby-version: '3.2'
+                  bundler-cache: true
+            - name: Set up Flutter
+              uses: subosito/flutter-action@v2
+              with:
+                  flutter-version: ${{ vars.FLUTTER_VERSION || fromYaml(readFile('pubspec.yaml')).flutter_version }}
+                  channel: 'stable'
+                  cache: true
+            - name: Install Fastlane
+              run: |
+                  gem install fastlane
+                  gem install bundler
+            - name: Set up Java
+              uses: actions/setup-java@v4
+              with:
+                  distribution: 'temurin'
+                  java-version: '17'
+            - name: Generate keystore.properties
+              run: |
+                  cat <<EOF > ./android/key.properties
+                  storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+                  keyPassword=${{ secrets.KEYSTORE_PASSWORD }}
+                  keyAlias=upload
+                  storeFile=./upload-keystore.jks
+                  EOF
+            - name: Decode keystore and create jks
+              run: echo "${{ secrets.KEYSTORE_JKS_BASE64 }}" | base64 --decode > ./android/app/upload-keystore.jks
+            - name: Run Fastlane
+              run: |
+                  cd android
+                  fastlane build_and_deploy
+              env:
+                  KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
