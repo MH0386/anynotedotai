@@ -49,3 +49,13 @@ app.*.map.json
 .fvm/
 
 /android/google_play.json
+
+# Devenv
+.devenv*
+devenv.local.nix
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
