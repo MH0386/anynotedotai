@@ -50,7 +50,7 @@
     systemImages.enable = true;
     ndk.enable = true;
     googleAPIs.enable = true;
-    googleTVAddOns.enable = true;
+    # googleTVAddOns.enable = true;
     extras = [ "extras;google;gcm" ];
     extraLicenses = [
       "android-sdk-preview-license"
