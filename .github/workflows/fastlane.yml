@@ -43,6 +43,10 @@ jobs:
               with:
                   distribution: 'temurin'
                   java-version: '17'
+            - name: Install dependencies
+              uses: upciti/wakemeops-action@v1
+              with:
+                  packages: dasel
             - name: Generate keystore.properties
               run: |
                   cat <<EOF > ./android/key.properties
@@ -53,10 +57,63 @@ jobs:
                   EOF
             - name: Decode keystore and create jks
               run: echo "${{ secrets.KEYSTORE_JKS_BASE64 }}" | base64 --decode > ./android/app/upload-keystore.jks
+            - name: Extract version from pubspec.yaml
+              id: extract_version
+              run: |
+                  version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | cut -d '+' -f 1 | tr -d '\r')
+                  echo "VERSION=$version" >> $GITHUB_ENV
+            - name: Extract version code from pubspec.yaml
+              id: extract_version_code
+              run: |
+                  version_code=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | cut -d '+' -f 2 | tr -d '\r')
+                  echo "VERSION_CODE=$version_code" >> $GITHUB_ENV
+            - name: Update version
+              id: modify_tag
+              run: |
+                  increment_version() {
+                      # Split the version into an array
+                      IFS='.' read -r major minor patch <<< "$1"
+
+                      # Check if patch is 9
+                      if [ "$patch" -eq 9 ]; then
+                          patch=0
+                          ((minor++))
+                      else
+                          ((patch++))
+                      fi
+
+                      # Check if minor is now 10 (after incrementing)
+                      if [ "$minor" -eq 10 ]; then
+                          minor=0
+                          ((major++))
+                      fi
+
+                      echo "$major.$minor.$patch"
+                  }
+
+                  # Increment the version
+                  new_version=$(increment_version "${{ env.VERSION }}")
+                  echo "VERSION=$new_version" >> $GITHUB_ENV
+
+                  # Increment the version code
+                  new_version_code=$(( ${{ env.VERSION_CODE }} + 1 ))
+                  echo "VERSION_CODE=$new_version_code" >> $GITHUB_ENV
+            - name: Update YAML file
+              run: |
+                  dasel put -t string -f pubspec.yaml -r yaml -v ${{ env.VERSION }}+${{ env.VERSION_CODE }} "version"
+            - name: Commit and Push
+              run: |
+                  git config --global user.email "mohamed.hisham.abdelzaher@gmail.com"
+                  git config --global user.name "Mohamed Hisham Abdelzaher"
+                  git config pull.rebase false
+                  git add pubspec.yaml
+                  git commit -m "Update version to ${{ env.VERSION }}"
+                  git pull
+                  git push
             - name: Run Fastlane
               run: |
                   cd android
-                  fastlane build_and_deploy
+                  fastlane internal
               env:
                   KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
