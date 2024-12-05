@@ -3,7 +3,7 @@
 
   inputs = {
     flake-parts.url = "github:hercules-ci/flake-parts";
-    nixpkgs.url = "github:cachix/devenv-nixpkgs/rolling";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     devenv.url = "github:cachix/devenv";
     mk-shell-bin.url = "github:rrbutani/nix-mk-shell-bin";
     devenv-root = {
@@ -27,10 +27,10 @@
       imports = [ inputs.devenv.flakeModule ];
       systems = [
         "x86_64-linux"
-        "i686-linux"
-        "x86_64-darwin"
-        "aarch64-linux"
-        "aarch64-darwin"
+        # "i686-linux"
+        # "x86_64-darwin"
+        # "aarch64-linux"
+        # "aarch64-darwin"
       ];
 
       perSystem =
@@ -73,10 +73,17 @@
             '';
 
             processes.hello.exec = "hello";
-
+            languages.java = {
+              enable = true;
+              jdk.package = pkgs.lib.mkDefault pkgs.jdk17;
+              gradle.enable = true;
+            };
             android = {
               enable = true;
-              flutter.enable = true;
+              flutter = {
+                enable = true;
+                package = pkgs.flutter;
+              };
               platforms.version = [
                 "32"
                 "34"
