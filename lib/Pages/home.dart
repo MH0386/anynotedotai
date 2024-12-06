@@ -9,6 +9,7 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     // final chatacterController = Get.find<ChatacterController>();
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(),
       home: Scaffold(
         body: LayoutBuilder(

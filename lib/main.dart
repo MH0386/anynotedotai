@@ -9,8 +9,6 @@ import 'package:get/get.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Client client = Client();
-  // client.setEndpoint('https://cloud.appwrite.io/v1').setProject('chatacter');
   Get.put(ChatacterController());
   Get.changeTheme(ThemeData.dark());
   if (kDebugMode) {

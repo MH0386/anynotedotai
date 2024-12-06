@@ -1,0 +1,21 @@
+default_platform(:android)
+
+platform :android do
+  desc "Deploy a new version to the Google Play Internal track"
+  lane :internal do 
+    # build the app bundle if you haven't already 
+    # sh "flutter build appbundle"
+    # sh "flutter build apk"
+    # Upload to internal test
+    upload_to_play_store(
+      track: 'internal',
+      aab: '../AnyNote.AI.aab',
+      skip_upload_apk: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_aab: false,
+    )
+  end
+end
