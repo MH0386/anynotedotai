@@ -7,6 +7,10 @@ on:
 jobs:
     fastlane:
         runs-on: ubuntu-latest
+        env:
+            KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+            GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+            GH_TOKEN: ${{ secrets.TOKEN_GITHUB }}
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
@@ -145,6 +149,3 @@ jobs:
               run: |
                   cd android
                   fastlane internal
-              env:
-                  KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-                  GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
