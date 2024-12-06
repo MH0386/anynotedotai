@@ -48,7 +48,7 @@ app.*.map.json
 # FVM Version Cache
 .fvm/
 
-/android/google_play.json
+/android/google-services.json
 
 # Devenv
 .devenv*
