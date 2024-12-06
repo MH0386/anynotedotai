@@ -36,6 +36,13 @@ jobs:
                   flutter-version: ${{ env.FLUTTER_VERSION }}
                   channel: 'stable'
                   cache: true
+            - name: Build Android App
+              uses: gradle/gradle-build-action@v2
+              with:
+                  arguments: >-
+                    clean
+                    assembleRelease
+                  working-directory: android
             - name: Install Fastlane
               run: |
                   gem install fastlane
