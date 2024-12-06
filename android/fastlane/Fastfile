@@ -4,7 +4,7 @@ platform :android do
   desc "Deploy a new version to the Google Play Internal track"
   lane :internal do 
     # build the app bundle if you haven't already 
-    gradle(task: 'bundleRelease')
+    sh "flutter build appbundle -v" 
     # Upload to internal test
     upload_to_play_store(
       track: 'internal',
