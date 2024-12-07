@@ -4,7 +4,8 @@ AnyNote.AI is a powerful note-taking app that helps you organize your notes in a
 
 ## Installation
 
-[<img alt="Get it on GitHub" src="docs/badges/github.png" width="200px">](https://github.com/MH0386/anynotedotai/releases/latest)
+[<img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80">](https://github.com/MH0386/anynotedotai/releases/latest)
+<!-- [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80">](https://f-droid.org/packages/dev.imranr.obtainium.fdroid/) -->
 
 ## License
 
