@@ -11,6 +11,7 @@ class Menu extends StatelessWidget {
   Widget build(BuildContext context) {
     // final chatacterController = Get.find<ChatacterController>();
     return HiddenDrawerMenu(
+      // disableAppBarDefault: true,
       screens: [
         ScreenHiddenDrawer(
           ItemHiddenMenu(

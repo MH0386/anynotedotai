@@ -10,6 +10,7 @@ class Settings extends StatelessWidget {
   Widget build(BuildContext context) {
     final chatacterController = Get.find<ChatacterController>();
     return MaterialApp(
+      theme: ThemeData.dark(),
       home: Scaffold(
         body: Center(
           child: ListView(
