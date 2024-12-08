@@ -3,7 +3,7 @@ description: This is a simple note app built using Flutter and GetX
 version: 1.0.9+9
 environment:
   sdk: '>=3.4.3 <4.0.0'
-  flutter: 3.24.4
+  flutter: 3.24.5
 dependencies:
   flutter:
     sdk: flutter
