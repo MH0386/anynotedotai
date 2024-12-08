@@ -1,4 +1,4 @@
-name: Fastlane
+name: Flutter CI/CD
 on:
   #  push:
   #    branches:
@@ -6,6 +6,11 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+env:
+  UV_SYSTEM_PYTHON: 1
+  KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+  GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+  GH_TOKEN: ${{ secrets.TOKEN_GITHUB }}
 jobs:
   create_important_files:
     runs-on: ubuntu-latest
@@ -38,10 +43,6 @@ jobs:
     needs: create_important_files
     runs-on: ubuntu-latest
     name: Install Dependencies
-    env:
-      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-      GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
-      GH_TOKEN: ${{ secrets.TOKEN_GITHUB }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -58,6 +59,12 @@ jobs:
         uses: upciti/wakemeops-action@v1
         with:
           packages: yq
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Install SemVer
+        run: npm install semver
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -96,40 +103,12 @@ jobs:
             ${{ runner.os }}-anynotedotai-
       - name: Extract version and version code from pubspec.yaml
         run: |
-          version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | cut -d '+' -f 1 | tr -d '\r')
-          echo "VERSION=$version" >> $GITHUB_ENV
-          version_code=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | cut -d '+' -f 2 | tr -d '\r')
-          echo "VERSION_CODE=$version_code" >> $GITHUB_ENV
+          echo "VERSION=$(yq -r '.version' 'pubspec.yaml' | cut -d '+' -f 1)" >> $GITHUB_ENV
+          echo "VERSION_CODE=$(yq -r '.version' 'pubspec.yaml' | cut -d '+' -f 2)" >> $GITHUB_ENV
       - name: Update version
         run: |
-          increment_version() {
-              # Split the version into an array
-              IFS='.' read -r major minor patch <<< "$1"
-          
-              # Check if patch is 9
-              if [ "$patch" -eq 9 ]; then
-                  patch=0
-                  ((minor++))
-              else
-                  ((patch++))
-              fi
-          
-              # Check if minor is now 10 (after incrementing)
-              if [ "$minor" -eq 10 ]; then
-                  minor=0
-                  ((major++))
-              fi
-          
-              echo "$major.$minor.$patch"
-          }
-          
-          # Increment the version
-          new_version=$(increment_version "${{ env.VERSION }}")
-          echo "VERSION=$new_version" >> $GITHUB_ENV
-          
-          # Increment the version code
-          new_version_code=$(( ${{ env.VERSION_CODE }} + 1 ))
-          echo "VERSION_CODE=$new_version_code" >> $GITHUB_ENV
+          echo "VERSION=$(npx semver -i ${{ env.VERSION }})" >> $GITHUB_OUTPUT
+          echo "VERSION_CODE=$(( ${{ env.VERSION_CODE }} + 1 ))" >> $GITHUB_OUTPUT
       - name: Update YAML file
         run: |
           yq '.version = ${{ env.VERSION }}+${{ env.VERSION_CODE }}' -i pubspec.yaml -y
@@ -168,8 +147,9 @@ jobs:
         run: flutter build appbundle
       - name: Release
         run: |
-          mv ./build/app/outputs/flutter-apk/app-release.apk ./AnyNote.AI.apk
-          mv ./build/app/outputs/bundle/release/app-release.aab ./AnyNote.AI.aab
+          mkdir -p release
+          mv ./build/app/outputs/flutter-apk/app-release.apk release/AnyNote.AI.${{env.VERSION}}.apk
+          mv ./build/app/outputs/bundle/release/app-release.aab release/AnyNote.AI.${{env.VERSION}}.aab
       - name: Create Release
         run: |
           gh release create v${{ env.VERSION }} \
