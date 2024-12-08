@@ -22,6 +22,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
+            ~/.npm
             ~/.gradle
             ~/.pub-cache
           key: ${{ runner.os }}-anynotedotai-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
@@ -50,6 +51,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
+            ~/.npm
             ~/.gradle
             ~/.pub-cache
           key: ${{ runner.os }}-anynotedotai-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
@@ -61,8 +63,7 @@ jobs:
           packages: yq
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'npm'
+          node-version: lts/*
       - name: Install SemVer
         run: npm install semver
       - name: Set up Ruby
@@ -96,6 +97,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
+            ~/.npm
             ~/.gradle
             ~/.pub-cache
           key: ${{ runner.os }}-anynotedotai-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
@@ -110,8 +112,7 @@ jobs:
           echo "VERSION=$(npx semver -i ${{ env.VERSION }})" >> $GITHUB_OUTPUT
           echo "VERSION_CODE=$(( ${{ env.VERSION_CODE }} + 1 ))" >> $GITHUB_OUTPUT
       - name: Update YAML file
-        run: |
-          yq '.version = ${{ env.VERSION }}+${{ env.VERSION_CODE }}' -i pubspec.yaml -y
+        run: yq -i '.version = "${{ env.VERSION }}+${{ env.VERSION_CODE }}"' pubspec.yaml
       - name: Commit and Push
         run: |
           git config --global user.email "mohamed.hisham.abdelzaher@gmail.com"
@@ -132,6 +133,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
+            ~/.npm
             ~/.gradle
             ~/.pub-cache
           key: ${{ runner.os }}-anynotedotai-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
@@ -171,6 +173,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
+            ~/.npm
             ~/.gradle
             ~/.pub-cache
           key: ${{ runner.os }}-anynotedotai-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
