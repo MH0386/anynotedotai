@@ -90,6 +90,9 @@ jobs:
     needs: install_dependencies
     runs-on: ubuntu-latest
     name: Update Version of the app
+    outputs:
+      VERSION: ${{ steps.update_version.outputs.VERSION }}
+      VERSION_CODE: ${{ steps.update_version.outputs.VERSION_CODE }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -108,6 +111,7 @@ jobs:
           echo "VERSION=$(yq -r '.version' 'pubspec.yaml' | cut -d '+' -f 1)" >> $GITHUB_ENV
           echo "VERSION_CODE=$(yq -r '.version' 'pubspec.yaml' | cut -d '+' -f 2)" >> $GITHUB_ENV
       - name: Update version
+        id: update_version
         run: |
           echo "VERSION=$(npx semver -i ${{ env.VERSION }})" >> $GITHUB_OUTPUT
           echo "VERSION_CODE=$(( ${{ env.VERSION_CODE }} + 1 ))" >> $GITHUB_OUTPUT
@@ -150,18 +154,18 @@ jobs:
       - name: Release
         run: |
           mkdir -p release
-          mv ./build/app/outputs/flutter-apk/app-release.apk release/AnyNote.AI.${{env.VERSION}}.apk
-          mv ./build/app/outputs/bundle/release/app-release.aab release/AnyNote.AI.${{env.VERSION}}.aab
+          mv ./build/app/outputs/flutter-apk/app-release.apk release/AnyNote.AI.${{ needs.update_version.outputs.VERSION }}.apk
+          mv ./build/app/outputs/bundle/release/app-release.aab release/AnyNote.AI.${{ needs.update_version.outputs.VERSION }}.aab
       - name: Create Release
         run: |
-          gh release create v${{ env.VERSION }} \
+          gh release create v${{ needs.update_version.outputs.VERSION }} \
               --repo=MH0386/anynotedotai \
-              --title="Version v${{ env.VERSION }}" \
+              --title="Version v${{ needs.update_version.outputs.VERSION }}" \
               --generate-notes \
               --latest
       - name: Upload Assets
         run: |
-          gh release upload --clobber v${{ env.VERSION }} ./AnyNote.AI.aab ./AnyNote.AI.apk
+          gh release upload --clobber v${{ needs.update_version.outputs.VERSION }} release/*
   upload_to_playstore:
     needs: build_flutter
     runs-on: ubuntu-latest
