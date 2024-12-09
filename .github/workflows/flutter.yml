@@ -136,6 +136,7 @@ jobs:
           name: release
           path: release
       - run: ls -a
+      - run: ls -a release
       - name: Create Release
         run: |
           gh release create v${{ needs.updated_version.outputs.VERSION }} \
