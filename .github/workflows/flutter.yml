@@ -69,6 +69,14 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+      - name: Read Android NDK version
+        run: echo "NDK_VERSION=$(cat .ndk-version)" >> $GITHUB_ENV
+      - name: Setup Android NDK
+        id: setup-ndk
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: ${{ env.NDK_VERSION }}
+          add-to-path: false
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -105,6 +113,13 @@ jobs:
         run: flutter clean
       - name: Install dependencies
         run: flutter pub get
+      - name: Setup Isar
+        run: |
+          sudo apt-get install -y tofrodos
+          fromdos .isar/tool/build_android.sh
+          bash scripts/isar/fdroid_build_isar.sh x86 arm64
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
       - name: Build APK
         run: flutter build apk --release
       - name: Build AppBundle
