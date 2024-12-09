@@ -134,6 +134,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: release
+          path: release
       - run: ls -a
       - name: Create Release
         run: |
@@ -165,5 +166,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: release
+          path: release
       - name: Run Fastlane
         run: cd android && bundle exec fastlane internal
