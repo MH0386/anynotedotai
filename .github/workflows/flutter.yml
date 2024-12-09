@@ -108,6 +108,11 @@ jobs:
           mkdir -p release
           mv ./build/app/outputs/flutter-apk/app-release.apk release/AnyNote.AI.${{ env.VERSION }}.apk
           mv ./build/app/outputs/bundle/release/app-release.aab release/AnyNote.AI.${{ env.VERSION }}.aab
+      - name: Upload Apps
+        uses: actions/upload-artifact@v2
+        with:
+          name: release
+          path: release
   upload_to_github:
     needs: flutter
     runs-on: ubuntu-latest
@@ -125,6 +130,10 @@ jobs:
           key: ${{ runner.os }}-anynotedotai-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-anynotedotai-
+      - name: Download Apps
+        uses: actions/download-artifact@v2
+        with:
+          name: release
       - name: Create Release
         run: |
           gh release create "v${{ needs.updated_version.outputs.VERSION }}" \
@@ -151,5 +160,9 @@ jobs:
           key: ${{ runner.os }}-anynotedotai-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-anynotedotai-
+      - name: Download Apps
+        uses: actions/download-artifact@v2
+        with:
+          name: release
       - name: Run Fastlane
         run: cd android && bundle exec fastlane internal
