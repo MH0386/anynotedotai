@@ -134,15 +134,16 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: release
+      - run: ls -a
       - name: Create Release
         run: |
-          gh release create "v${{ needs.updated_version.outputs.VERSION }}" \
+          gh release create v${{ needs.updated_version.outputs.VERSION }} \
               --repo=MH0386/anynotedotai \
-              --title="Version 'v${{ needs.updated_version.outputs.VERSION }}'" \
+              --title="Version v${{ needs.updated_version.outputs.VERSION }}" \
               --generate-notes \
               --latest
       - name: Upload Assets
-        run: gh release upload --clobber "v${{ needs.updated_version.outputs.VERSION }}" release/*
+        run: gh release upload --clobber v${{ needs.updated_version.outputs.VERSION }} release/*
   upload_to_playstore:
     needs: flutter
     runs-on: ubuntu-latest
