@@ -79,10 +79,12 @@ jobs:
           echo "VERSION=$(yq -r '.version' 'pubspec.yaml' | cut -d '+' -f 1)" >> $GITHUB_ENV
           echo "VERSION_CODE=$(yq -r '.version' 'pubspec.yaml' | cut -d '+' -f 2)" >> $GITHUB_ENV
       - name: Update version
-        id: updated_version
         run: |
           echo "VERSION=$(npx semver -i ${{ env.VERSION }})" >> $GITHUB_ENV
           echo "VERSION_CODE=$(( ${{ env.VERSION_CODE }} + 1 ))" >> $GITHUB_ENV
+      - name: Export version and version code
+        id: updated_version
+        run: |
           echo "VERSION=${{ env.VERSION }}" >> $GITHUB_OUTPUT
           echo "VERSION_CODE=${{ env.VERSION_CODE }}" >> $GITHUB_OUTPUT
       - name: Update YAML file
