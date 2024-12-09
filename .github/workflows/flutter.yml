@@ -115,6 +115,7 @@ jobs:
         run: flutter pub get
       - name: Setup Isar
         run: |
+          ls -a
           sudo apt-get install -y tofrodos
           fromdos .isar/tool/build_android.sh
           bash scripts/isar/fdroid_build_isar.sh x86 arm64
