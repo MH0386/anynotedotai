@@ -19,7 +19,9 @@ jobs:
       VERSION_CODE: ${{ steps.updated_version.outputs.VERSION_CODE }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4        
+        with:
+          submodules: 'true'
       - name: Cache
         uses: actions/cache@v4
         with:
