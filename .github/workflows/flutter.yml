@@ -110,8 +110,8 @@ jobs:
       - name: Release
         run: |
           mkdir -p release
-          mv ./build/app/outputs/flutter-apk/app-release.apk release/AnyNote.AI.${{ env.VERSION }}.apk
-          mv ./build/app/outputs/bundle/release/app-release.aab release/AnyNote.AI.${{ env.VERSION }}.aab
+          mv ./build/app/outputs/flutter-apk/app-release.apk release/AnyNote.AI_v${{ env.VERSION }}.apk
+          mv ./build/app/outputs/bundle/release/app-release.aab release/AnyNote.AI_v${{ env.VERSION }}.aab
       - name: Upload Apps
         uses: actions/upload-artifact@v4
         with:
