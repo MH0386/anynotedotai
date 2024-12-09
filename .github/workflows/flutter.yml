@@ -109,7 +109,7 @@ jobs:
           mv ./build/app/outputs/flutter-apk/app-release.apk release/AnyNote.AI.${{ env.VERSION }}.apk
           mv ./build/app/outputs/bundle/release/app-release.aab release/AnyNote.AI.${{ env.VERSION }}.aab
       - name: Upload Apps
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: release
           path: release
@@ -131,7 +131,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-anynotedotai-
       - name: Download Apps
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: release
       - name: Create Release
@@ -161,7 +161,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-anynotedotai-
       - name: Download Apps
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: release
       - name: Run Fastlane
