@@ -12,9 +12,11 @@ env:
   GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
   GH_TOKEN: ${{ secrets.TOKEN_GITHUB }}
 jobs:
-  create_important_files:
+  flutter:
     runs-on: ubuntu-latest
-    name: Create Important Files
+    outputs:
+      VERSION: ${{ steps.updated_version.outputs.VERSION }}
+      VERSION_CODE: ${{ steps.updated_version.outputs.VERSION_CODE }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -28,6 +30,7 @@ jobs:
           key: ${{ runner.os }}-anynotedotai-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-anynotedotai-
+      # Create Important Files
       - name: Generate keystore.properties
         run: |
           cat <<EOF > ./android/key.properties
@@ -40,23 +43,7 @@ jobs:
         run: echo "${{ secrets.KEYSTORE_JKS_BASE64 }}" | base64 --decode > ./android/app/upload-keystore.jks
       - name: Decode google-services.json
         run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 --decode > ./android/google-services.json    
-  install_dependencies:
-    needs: create_important_files
-    runs-on: ubuntu-latest
-    name: Install Dependencies
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            ~/.gradle
-            ~/.pub-cache
-          key: ${{ runner.os }}-anynotedotai-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-anynotedotai-
+      # Install Dependencies
       - name: Install dependencies
         uses: upciti/wakemeops-action@v1
         with:
@@ -86,32 +73,13 @@ jobs:
           flutter-version-file: pubspec.yaml
           channel: 'stable'
           cache: true
-  update_version:
-    needs: install_dependencies
-    runs-on: ubuntu-latest
-    name: Update Version of the app
-    outputs:
-      VERSION: ${{ steps.update_version.outputs.VERSION }}
-      VERSION_CODE: ${{ steps.update_version.outputs.VERSION_CODE }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            ~/.gradle
-            ~/.pub-cache
-          key: ${{ runner.os }}-anynotedotai-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-anynotedotai-
+      # Update Version of the app
       - name: Extract version and version code from pubspec.yaml
         run: |
           echo "VERSION=$(yq -r '.version' 'pubspec.yaml' | cut -d '+' -f 1)" >> $GITHUB_ENV
           echo "VERSION_CODE=$(yq -r '.version' 'pubspec.yaml' | cut -d '+' -f 2)" >> $GITHUB_ENV
       - name: Update version
-        id: update_version
+        id: updated_version
         run: |
           echo "VERSION=$(npx semver -i ${{ env.VERSION }})" >> $GITHUB_ENV
           echo "VERSION_CODE=$(( ${{ env.VERSION_CODE }} + 1 ))" >> $GITHUB_ENV
@@ -126,10 +94,24 @@ jobs:
           git commit -m "Update version to ${{ env.VERSION }}+${{ env.VERSION_CODE }}"
           git pull
           git push
-  build_flutter:
-    needs: update_version
+      # Build Flutter
+      - name: Clean
+        run: flutter clean
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Build APK
+        run: flutter build apk --release
+      - name: Build AppBundle
+        run: flutter build appbundle
+      - name: Release
+        run: |
+          mkdir -p release
+          mv ./build/app/outputs/flutter-apk/app-release.apk release/AnyNote.AI.${{ env.VERSION }}.apk
+          mv ./build/app/outputs/bundle/release/app-release.aab release/AnyNote.AI.${{ env.VERSION }}.aab
+  upload_to_github:
+    needs: flutter
     runs-on: ubuntu-latest
-    name: Build Flutter
+    name: Upload to GitHub
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -143,31 +125,17 @@ jobs:
           key: ${{ runner.os }}-anynotedotai-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-anynotedotai-
-      - name: Clean
-        run: flutter clean
-      - name: Install dependencies
-        run: flutter pub get
-      - name: Build APK
-        run: flutter build apk --release
-      - name: Build AppBundle
-        run: flutter build appbundle
-      - name: Release
-        run: |
-          mkdir -p release
-          mv ./build/app/outputs/flutter-apk/app-release.apk release/AnyNote.AI.${{ needs.update_version.outputs.VERSION }}.apk
-          mv ./build/app/outputs/bundle/release/app-release.aab release/AnyNote.AI.${{ needs.update_version.outputs.VERSION }}.aab
       - name: Create Release
         run: |
-          gh release create v${{ needs.update_version.outputs.VERSION }} \
+          gh release create v${{ needs.flutter.outputs.VERSION }} \
               --repo=MH0386/anynotedotai \
-              --title="Version v${{ needs.update_version.outputs.VERSION }}" \
+              --title="Version v${{ needs.flutter.outputs.VERSION }}" \
               --generate-notes \
               --latest
       - name: Upload Assets
-        run: |
-          gh release upload --clobber v${{ needs.update_version.outputs.VERSION }} release/*
+        run: gh release upload --clobber v${{ needs.flutter.outputs.VERSION }} release/*
   upload_to_playstore:
-    needs: build_flutter
+    needs: flutter
     runs-on: ubuntu-latest
     name: Upload to Play Store
     steps:
