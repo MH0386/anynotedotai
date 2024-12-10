@@ -63,3 +63,7 @@ devenv.local.nix
 node_modules/
 package-lock.json
 package.json
+
+# Added by cargo
+
+/target
