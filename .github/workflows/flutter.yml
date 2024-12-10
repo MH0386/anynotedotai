@@ -80,7 +80,7 @@ jobs:
             - name: Setup Rust
               uses: actions-rust-lang/setup-rust-toolchain@v1
               with:
-                  cache: true
+                  cache: false
                   rustflags: ""
             - name: Set up Flutter
               uses: subosito/flutter-action@v2
