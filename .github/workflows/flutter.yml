@@ -113,6 +113,7 @@ jobs:
               run: |
                   sudo apt-get install -y tofrodos
                   cp Cargo.lock .isar/Cargo.lock
+                  cp Cargo.lock .isar-cargo.lock
                   fromdos .isar/tool/build_android.sh
                   bash scripts/isar/fdroid_build_isar.sh
               env:
