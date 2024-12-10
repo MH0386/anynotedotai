@@ -76,7 +76,12 @@ jobs:
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: ${{ env.NDK_VERSION }}
-          add-to-path: false
+          # add-to-path: false
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          cache: true
+          # rustflags: ""
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -99,15 +104,6 @@ jobs:
           echo "VERSION_CODE=${{ env.VERSION_CODE }}" >> $GITHUB_OUTPUT
       - name: Update YAML file
         run: yq -i '.version = "${{ env.VERSION }}+${{ env.VERSION_CODE }}"' pubspec.yaml
-      - name: Commit and Push
-        run: |
-          git config --global user.email "mohamed.hisham.abdelzaher@gmail.com"
-          git config --global user.name "Mohamed Hisham Abdelzaher"
-          git config pull.rebase false
-          git add pubspec.yaml
-          git commit -m "Update version to ${{ env.VERSION }}+${{ env.VERSION_CODE }}"
-          git pull
-          git push
       # Build Flutter
       - name: Clean
         run: flutter clean
@@ -134,6 +130,15 @@ jobs:
         with:
           name: release
           path: release
+      - name: Commit and Push
+        run: |
+          git config --global user.email "mohamed.hisham.abdelzaher@gmail.com"
+          git config --global user.name "Mohamed Hisham Abdelzaher"
+          git config pull.rebase false
+          git add pubspec.yaml
+          git commit -m "Update version to ${{ env.VERSION }}+${{ env.VERSION_CODE }}"
+          git pull
+          git push
   upload_to_github:
     needs: flutter
     runs-on: ubuntu-latest
