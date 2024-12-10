@@ -112,6 +112,7 @@ jobs:
             - name: Setup Isar
               run: |
                   sudo apt-get install -y tofrodos
+                  cp .isar-cargo.lock .isar/Cargo.lock
                   fromdos .isar/tool/build_android.sh
                   bash scripts/isar/fdroid_build_isar.sh
               env:
