@@ -1,196 +1,196 @@
 name: Flutter
 on:
-  #  push:
-  #    branches:
-  #      - main
-  workflow_dispatch:
+    push:
+        branches:
+            - main
+    workflow_dispatch:
 permissions:
-  contents: write
+    contents: write
 env:
-  UV_SYSTEM_PYTHON: 1
-  KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-  GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
-  GH_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+    UV_SYSTEM_PYTHON: 1
+    KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+    GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+    GH_TOKEN: ${{ secrets.TOKEN_GITHUB }}
 jobs:
-  flutter:
-    runs-on: ubuntu-latest
-    outputs:
-      VERSION: ${{ steps.updated_version.outputs.VERSION }}
-      VERSION_CODE: ${{ steps.updated_version.outputs.VERSION_CODE }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4        
-        with:
-          submodules: 'true'
-      - name: Cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            ~/.gradle
-            ~/.pub-cache
-          key: ${{ runner.os }}-anynotedotai-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-anynotedotai-
-      # Create Important Files
-      - name: Generate keystore.properties
-        run: |
-          cat <<EOF > ./android/key.properties
-          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
-          keyPassword=${{ secrets.KEYSTORE_PASSWORD }}
-          keyAlias=upload
-          storeFile=./upload-keystore.jks
-          EOF
-      - name: Decode keystore and create jks
-        run: echo "${{ secrets.KEYSTORE_JKS_BASE64 }}" | base64 --decode > ./android/app/upload-keystore.jks
-      - name: Decode google-services.json
-        run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 --decode > ./android/google-services.json    
-      # Install Dependencies
-      - name: Install dependencies
-        uses: upciti/wakemeops-action@v1
-        with:
-          packages: yq
-      - uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-      - name: Install SemVer
-        run: npm install semver
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.3'
-          bundler-cache: true
-      - name: Install Fastlane
-        run: |
-          gem install fastlane
-          gem install bundler
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-      - name: Read Android NDK version
-        run: echo "NDK_VERSION=$(cat .ndk-version)" >> $GITHUB_ENV
-      - name: Setup Android NDK
-        id: setup-ndk
-        uses: nttld/setup-ndk@v1
-        with:
-          ndk-version: ${{ env.NDK_VERSION }}
-          # add-to-path: false
-      - name: Setup Rust
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          cache: true
-          # rustflags: ""
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version-file: pubspec.yaml
-          channel: 'stable'
-          cache: true
-      # Update Version of the app
-      - name: Extract version and version code from pubspec.yaml
-        run: |
-          echo "VERSION=$(yq -r '.version' 'pubspec.yaml' | cut -d '+' -f 1)" >> $GITHUB_ENV
-          echo "VERSION_CODE=$(yq -r '.version' 'pubspec.yaml' | cut -d '+' -f 2)" >> $GITHUB_ENV
-      - name: Update version
-        run: |
-          echo "VERSION=$(npx semver -i ${{ env.VERSION }})" >> $GITHUB_ENV
-          echo "VERSION_CODE=$(( ${{ env.VERSION_CODE }} + 1 ))" >> $GITHUB_ENV
-      - name: Export version and version code
-        id: updated_version
-        run: |
-          echo "VERSION=${{ env.VERSION }}" >> $GITHUB_OUTPUT
-          echo "VERSION_CODE=${{ env.VERSION_CODE }}" >> $GITHUB_OUTPUT
-      - name: Update YAML file
-        run: yq -i '.version = "${{ env.VERSION }}+${{ env.VERSION_CODE }}"' pubspec.yaml
-      # Build Flutter
-      - name: Clean
-        run: flutter clean
-      - name: Install dependencies
-        run: flutter pub get
-      - name: Setup Isar
-        run: |
-          sudo apt-get install -y tofrodos
-          fromdos .isar/tool/build_android.sh
-          bash scripts/isar/fdroid_build_isar.sh
-        env:
-          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
-      - name: Build APK
-        run: flutter build apk --release
-      - name: Build AppBundle
-        run: flutter build appbundle
-      - name: Release
-        run: |
-          mkdir -p release
-          mv ./build/app/outputs/flutter-apk/app-release.apk release/AnyNote.AI_v${{ env.VERSION }}.apk
-          mv ./build/app/outputs/bundle/release/app-release.aab release/AnyNote.AI_v${{ env.VERSION }}.aab
-      - name: Upload Apps
-        uses: actions/upload-artifact@v4
-        with:
-          name: release
-          path: release
-      - name: Commit and Push
-        run: |
-          git config --global user.email "mohamed.hisham.abdelzaher@gmail.com"
-          git config --global user.name "Mohamed Hisham Abdelzaher"
-          git config pull.rebase false
-          git add pubspec.yaml
-          git commit -m "Update version to ${{ env.VERSION }}+${{ env.VERSION_CODE }}"
-          git pull
-          git push
-  upload_to_github:
-    needs: flutter
-    runs-on: ubuntu-latest
-    name: Upload to GitHub
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            ~/.gradle
-            ~/.pub-cache
-          key: ${{ runner.os }}-anynotedotai-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-anynotedotai-
-      - name: Download Apps
-        uses: actions/download-artifact@v4
-        with:
-          name: release
-          path: release
-      - name: Create Release
-        run: |
-          gh release create v${{ needs.flutter.outputs.VERSION }} \
-              --repo=MH0386/anynotedotai \
-              --title="Version v${{ needs.flutter.outputs.VERSION }}" \
-              --generate-notes \
-              --latest
-      - name: Upload Assets
-        run: gh release upload --clobber v${{ needs.flutter.outputs.VERSION }} release/*
-  upload_to_playstore:
-    needs: flutter
-    runs-on: ubuntu-latest
-    name: Upload to Play Store
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            ~/.gradle
-            ~/.pub-cache
-          key: ${{ runner.os }}-anynotedotai-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-anynotedotai-
-      - name: Download Apps
-        uses: actions/download-artifact@v4
-        with:
-          name: release
-          path: release
-      - name: Run Fastlane
-        run: cd android && bundle exec fastlane internal
+    flutter:
+        runs-on: ubuntu-latest
+        outputs:
+            VERSION: ${{ steps.updated_version.outputs.VERSION }}
+            VERSION_CODE: ${{ steps.updated_version.outputs.VERSION_CODE }}
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  submodules: "true"
+            - name: Cache
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      ~/.npm
+                      ~/.gradle
+                      ~/.pub-cache
+                  key: ${{ runner.os }}-anynotedotai-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+                  restore-keys: |
+                      ${{ runner.os }}-anynotedotai-
+            # Create Important Files
+            - name: Generate keystore.properties
+              run: |
+                  cat <<EOF > ./android/key.properties
+                  storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+                  keyPassword=${{ secrets.KEYSTORE_PASSWORD }}
+                  keyAlias=upload
+                  storeFile=./upload-keystore.jks
+                  EOF
+            - name: Decode keystore and create jks
+              run: echo "${{ secrets.KEYSTORE_JKS_BASE64 }}" | base64 --decode > ./android/app/upload-keystore.jks
+            - name: Decode google-services.json
+              run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 --decode > ./android/google-services.json
+            # Install Dependencies
+            - name: Install dependencies
+              uses: upciti/wakemeops-action@v1
+              with:
+                  packages: yq
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: lts/*
+            - name: Install SemVer
+              run: npm install semver
+            - name: Set up Ruby
+              uses: ruby/setup-ruby@v1
+              with:
+                  ruby-version: "3.3"
+                  bundler-cache: true
+            - name: Install Fastlane
+              run: |
+                  gem install fastlane
+                  gem install bundler
+            - name: Set up Java
+              uses: actions/setup-java@v4
+              with:
+                  distribution: "temurin"
+                  java-version: "17"
+            - name: Read Android NDK version
+              run: echo "NDK_VERSION=$(cat .ndk-version)" >> $GITHUB_ENV
+            - name: Setup Android NDK
+              id: setup-ndk
+              uses: nttld/setup-ndk@v1
+              with:
+                  ndk-version: ${{ env.NDK_VERSION }}
+                  # add-to-path: false
+            - name: Setup Rust
+              uses: actions-rust-lang/setup-rust-toolchain@v1
+              with:
+                  cache: true
+                  # rustflags: ""
+            - name: Set up Flutter
+              uses: subosito/flutter-action@v2
+              with:
+                  flutter-version-file: pubspec.yaml
+                  channel: "stable"
+                  cache: true
+            # Update Version of the app
+            - name: Extract version and version code from pubspec.yaml
+              run: |
+                  echo "VERSION=$(yq -r '.version' 'pubspec.yaml' | cut -d '+' -f 1)" >> $GITHUB_ENV
+                  echo "VERSION_CODE=$(yq -r '.version' 'pubspec.yaml' | cut -d '+' -f 2)" >> $GITHUB_ENV
+            - name: Update version
+              run: |
+                  echo "VERSION=$(npx semver -i ${{ env.VERSION }})" >> $GITHUB_ENV
+                  echo "VERSION_CODE=$(( ${{ env.VERSION_CODE }} + 1 ))" >> $GITHUB_ENV
+            - name: Export version and version code
+              id: updated_version
+              run: |
+                  echo "VERSION=${{ env.VERSION }}" >> $GITHUB_OUTPUT
+                  echo "VERSION_CODE=${{ env.VERSION_CODE }}" >> $GITHUB_OUTPUT
+            - name: Update YAML file
+              run: yq -i '.version = "${{ env.VERSION }}+${{ env.VERSION_CODE }}"' pubspec.yaml
+            # Build Flutter
+            - name: Clean
+              run: flutter clean
+            - name: Install dependencies
+              run: flutter pub get
+            - name: Setup Isar
+              run: |
+                  sudo apt-get install -y tofrodos
+                  fromdos .isar/tool/build_android.sh
+                  bash scripts/isar/fdroid_build_isar.sh
+              env:
+                  ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+            - name: Build APK
+              run: flutter build apk --release
+            - name: Build AppBundle
+              run: flutter build appbundle
+            - name: Release
+              run: |
+                  mkdir -p release
+                  mv ./build/app/outputs/flutter-apk/app-release.apk release/AnyNote.AI_v${{ env.VERSION }}.apk
+                  mv ./build/app/outputs/bundle/release/app-release.aab release/AnyNote.AI_v${{ env.VERSION }}.aab
+            - name: Upload Apps
+              uses: actions/upload-artifact@v4
+              with:
+                  name: release
+                  path: release
+            - name: Commit and Push
+              run: |
+                  git config --global user.email "mohamed.hisham.abdelzaher@gmail.com"
+                  git config --global user.name "Mohamed Hisham Abdelzaher"
+                  git config pull.rebase false
+                  git add pubspec.yaml
+                  git commit -m "Update version to ${{ env.VERSION }}+${{ env.VERSION_CODE }}"
+                  git pull
+                  git push
+    upload_to_github:
+        needs: flutter
+        runs-on: ubuntu-latest
+        name: Upload to GitHub
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+            - name: Cache
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      ~/.npm
+                      ~/.gradle
+                      ~/.pub-cache
+                  key: ${{ runner.os }}-anynotedotai-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+                  restore-keys: |
+                      ${{ runner.os }}-anynotedotai-
+            - name: Download Apps
+              uses: actions/download-artifact@v4
+              with:
+                  name: release
+                  path: release
+            - name: Create Release
+              run: |
+                  gh release create v${{ needs.flutter.outputs.VERSION }} \
+                      --repo=MH0386/anynotedotai \
+                      --title="Version v${{ needs.flutter.outputs.VERSION }}" \
+                      --generate-notes \
+                      --latest
+            - name: Upload Assets
+              run: gh release upload --clobber v${{ needs.flutter.outputs.VERSION }} release/*
+    upload_to_playstore:
+        needs: flutter
+        runs-on: ubuntu-latest
+        name: Upload to Play Store
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+            - name: Cache
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      ~/.npm
+                      ~/.gradle
+                      ~/.pub-cache
+                  key: ${{ runner.os }}-anynotedotai-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+                  restore-keys: |
+                      ${{ runner.os }}-anynotedotai-
+            - name: Download Apps
+              uses: actions/download-artifact@v4
+              with:
+                  name: release
+                  path: release
+            - name: Run Fastlane
+              run: cd android && bundle exec fastlane internal
