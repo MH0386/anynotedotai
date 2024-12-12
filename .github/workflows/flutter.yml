@@ -112,10 +112,9 @@ jobs:
             - name: Setup Isar
               run: |
                   sudo apt-get install -y tofrodos
-                  cp Cargo.lock .isar/Cargo.lock
                   cp Cargo.lock .isar-cargo.lock
                   fromdos .isar/tool/build_android.sh
-                  bash scripts/isar/fdroid_build_isar.sh
+                  bash scripts/isar/fdroid_build_isar.sh armv7 arm64
               env:
                   ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
             - name: Build APK
@@ -195,4 +194,4 @@ jobs:
                   name: release
                   path: release
             - name: Run Fastlane
-              run: cd android && bundle exec fastlane internal
+              run: fastlane internal
