@@ -103,7 +103,6 @@ jobs:
             - name: Setup Isar
               run: |
                   sudo apt-get install -y tofrodos gcc-multilib libc-dev make
-                  cp Cargo.lock .isar-cargo.lock
                   fromdos .isar/tool/build_android.sh
                   bash ./scripts/isar/fdroid_build_isar.sh armv7 arm64 x64
               env:
