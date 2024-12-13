@@ -1,5 +1,5 @@
 # A copy-paste Github Actions config to run dart-analyze and report the artifact to DeepSource
-name: Scan with dart-analyze
+name: DeepSource
 on:
   # Note that both `push` and `pull_request` triggers should be present for GitHub to consistently present dart-analyze
   # SARIF reports.
