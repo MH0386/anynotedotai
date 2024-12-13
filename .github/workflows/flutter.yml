@@ -55,15 +55,6 @@ jobs:
                   node-version: lts/*
             - name: Install SemVer
               run: npm install semver
-            - name: Set up Ruby
-              uses: ruby/setup-ruby@v1
-              with:
-                  ruby-version: "3.3"
-                  bundler-cache: true
-            - name: Install Fastlane
-              run: |
-                  gem install fastlane
-                  gem install bundler
             - name: Set up Java
               uses: actions/setup-java@v4
               with:
@@ -111,10 +102,10 @@ jobs:
               run: flutter pub get
             - name: Setup Isar
               run: |
-                  sudo apt-get install -y tofrodos
+                  sudo apt-get install -y tofrodos gcc-multilib libc-dev make
                   cp Cargo.lock .isar-cargo.lock
                   fromdos .isar/tool/build_android.sh
-                  bash scripts/isar/fdroid_build_isar.sh armv7 arm64
+                  bash ./scripts/isar/fdroid_build_isar.sh armv7 arm64 x64
               env:
                   ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
             - name: Build APK
@@ -188,10 +179,19 @@ jobs:
                   key: ${{ runner.os }}-anynotedotai-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
                   restore-keys: |
                       ${{ runner.os }}-anynotedotai-
+            - name: Set up Ruby
+              uses: ruby/setup-ruby@v1
+              with:
+                  ruby-version: "3.3"
+                  bundler-cache: true
+            - name: Install Fastlane
+              run: |
+                  gem install fastlane
+                  gem install bundler
             - name: Download Apps
               uses: actions/download-artifact@v4
               with:
                   name: release
                   path: release
             - name: Run Fastlane
-              run: fastlane internal
+              run: bundle exec fastlane internal
