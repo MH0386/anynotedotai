@@ -1,8 +1,8 @@
 name: Flutter
 on:
-    push:
-        branches:
-            - main
+#     push:
+#         branches:
+#             - main
     workflow_dispatch:
 permissions:
     contents: write
@@ -192,5 +192,7 @@ jobs:
               with:
                   name: release
                   path: release
+            - name: Prepare Files
+              run: mv release/AnyNote.AI_v${{ needs.flutter.outputs.VERSION }}.aab release/AnyNote.AI.aab
             - name: Run Fastlane
               run: bundle exec fastlane internal
