@@ -2,6 +2,7 @@ import 'package:anynotedotai/Pages/about.dart';
 import 'package:anynotedotai/Pages/home.dart';
 import 'package:anynotedotai/Pages/settings.dart';
 import 'package:anynotedotai/controller.dart';
+import 'package:anynotedotai/database/user.dart';
 import 'package:anynotedotai/menu.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
