@@ -40,7 +40,7 @@ arm64() {
 }
 
 test -d .isar || exit
-cp .isar-cargo.lock .isar/Cargo.lock
+# cp .isar-cargo.lock .isar/Cargo.lock
 (
   cd .isar || exit
   if [ "$#" -eq 0 ]; then
