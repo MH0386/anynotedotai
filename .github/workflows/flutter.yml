@@ -103,7 +103,7 @@ jobs:
             - name: Setup Isar
               run: |
                   sudo apt-get install -y tofrodos gcc-multilib libc-dev make
-                  flutter  pub run build_runner build
+                  flutter  pub run build_runner build --delete-conflicting-outputs
                   fromdos .isar/tool/build_android.sh
                   bash ./scripts/isar/fdroid_build_isar.sh armv7 arm64 x64
               env:
