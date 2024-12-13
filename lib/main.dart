@@ -6,9 +6,16 @@ import 'package:anynotedotai/menu.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:isar/isar.dart';
+import 'package:path_provider/path_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final dir = await getApplicationDocumentsDirectory();
+  final isar = await Isar.open(
+    [UserSchema],
+    directory: dir.path,
+  );
   Get.put(ChatacterController());
   Get.changeTheme(ThemeData.dark());
   if (kDebugMode) {
