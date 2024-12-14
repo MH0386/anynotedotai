@@ -49,6 +49,10 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
+
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a' // Explicitly include ARM ABIs
+        }
     }
 
     signingConfigs {
