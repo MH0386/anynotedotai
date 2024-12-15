@@ -5,7 +5,6 @@
   channel = "unstable"; # or "stable-23.11"
   # Use https://search.nixos.org/packages to find packages
   packages = [
-    pkgs.nodePackages.firebase-tools
     pkgs.jdk17
     pkgs.unzip
   ];
