@@ -4,7 +4,7 @@ platform :android do
   desc "Deploy a new version to the Google Play Internal track"
   lane :internal do 
     upload_to_play_store(
-      track: 'internal',
+      track: 'beta',
       aab: './release/AnyNote.AI.aab',
       skip_upload_apk: true,
       skip_upload_images: true,
