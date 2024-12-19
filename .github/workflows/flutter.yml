@@ -101,7 +101,8 @@ jobs:
             - name: Setup Isar
               run: |
                   sudo apt-get install -y tofrodos gcc-multilib libc-dev make
-                  flutter  pub run build_runner build --delete-conflicting-outputs
+                  flutter pub run build_runner build --delete-conflicting-outputs
+                  cargo generate-lockfile --manifest-path .isar/Cargo.toml
                   fromdos .isar/tool/build_android.sh
                   bash ./scripts/isar/fdroid_build_isar.sh armv7 arm64
               env:
