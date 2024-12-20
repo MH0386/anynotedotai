@@ -13,10 +13,7 @@ import 'package:path_provider/path_provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final dir = await getApplicationDocumentsDirectory();
-  final isar = await Isar.open(
-    [UserSchema],
-    directory: dir.path,
-  );
+  final isar = await Isar.open([UserSchema], directory: dir.path);
   Get.put(ChatacterController());
   Get.changeTheme(ThemeData.dark());
   if (kDebugMode) {
