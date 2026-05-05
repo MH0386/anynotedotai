@@ -9,3 +9,4 @@ AnyNote.AI is a powerful note-taking app that helps you organize your notes in a
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
