@@ -23,7 +23,7 @@ jobs:
               with:
                   submodules: "true"
             - name: Cache
-              uses: actions/cache@v4
+              uses: actions/cache@v6
               with:
                   path: |
                       ~/.npm
@@ -138,7 +138,7 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v4
             - name: Cache
-              uses: actions/cache@v4
+              uses: actions/cache@v6
               with:
                   path: |
                       ~/.npm
@@ -169,7 +169,7 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v4
             - name: Cache
-              uses: actions/cache@v4
+              uses: actions/cache@v6
               with:
                   path: |
                       ~/.npm
