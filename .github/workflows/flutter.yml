@@ -19,7 +19,7 @@ jobs:
             VERSION_CODE: ${{ steps.updated_version.outputs.VERSION_CODE }}
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
               with:
                   submodules: "true"
             - name: Cache
@@ -136,7 +136,7 @@ jobs:
         name: Upload to GitHub
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
             - name: Cache
               uses: actions/cache@v4
               with:
@@ -167,7 +167,7 @@ jobs:
         name: Upload to Play Store
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
             - name: Cache
               uses: actions/cache@v4
               with:
